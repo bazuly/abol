@@ -11,7 +11,7 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Images API",
+        title="Image service API",
         default_version='v1',
         description="API documentation for the images upload application",
     ),

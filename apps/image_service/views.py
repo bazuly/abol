@@ -2,8 +2,9 @@ from rest_framework import viewsets, permissions
 from .models import ImageModel
 from .serializers import ImageSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from apps.images.services import (
-    extract_metadata, convert_to_grayscale, save_resized_image
+from apps.image_service.services.image_extraction import extract_metadata
+from apps.image_service.services.image_process import (
+    convert_to_grayscale, save_resized_image
 )
 from PIL import Image
 
@@ -15,7 +16,6 @@ class ImageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def perform_create(self, serializer):
-        # Сохраняем основное изображение
         image_instance = serializer.save()
         original_image_path = image_instance.file_path.path
 

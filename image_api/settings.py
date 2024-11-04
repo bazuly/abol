@@ -1,7 +1,10 @@
 from pathlib import Path
 import os
 from datetime import timedelta
-import environ
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +26,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.images',
+
     'rest_framework_simplejwt',
     'rest_framework',
+    'drf_yasg',
 
+    'apps.image_service',
+    'apps.users',
 
 ]
 
@@ -60,20 +66,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'image_api.wsgi.application'
 
-# environment
-env = environ.Env()
-environ.Env.read_env()
-
 
 # database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': env('POSTGRES_HOST', default='db'),
-        'PORT': env('POSTGRES_PORT', default='5432'),
+        'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
