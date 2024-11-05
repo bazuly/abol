@@ -2,9 +2,14 @@ from rest_framework import viewsets, permissions
 from .models import ImageModel
 from .serializers import ImageSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from apps.image_service.services.image_extraction import extract_metadata
-from apps.image_service.services.image_process import (
+from apps.image_service.services.image_handlers.image_extraction import (
+    extract_metadata
+)
+from apps.image_service.services.image_handlers.image_process import (
     convert_to_grayscale, save_resized_image
+)
+from apps.image_service.services.rabbitMQ_handlers.messaging import (
+    publish_message
 )
 from PIL import Image
 
@@ -17,20 +22,21 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         image_instance = serializer.save()
+        publish_message(
+            'image_uploaded',
+            image_instance.id,
+            'Image created successfully'
+        )
         original_image_path = image_instance.file_path.path
 
-        # Открываем изображение с помощью Pillow
         with Image.open(original_image_path) as img:
-            # Извлекаем метаданные
             metadata = extract_metadata(img, original_image_path)
             image_instance.format = metadata['format']
             image_instance.size = metadata['size']
             image_instance.resolution = metadata['resolution']
 
-            # Преобразуем изображение в оттенки серого
             grayscale_img = convert_to_grayscale(img)
 
-            # Сохраняем изображения разных размеров
             image_instance.file_path_small = save_resized_image(
                 grayscale_img, (100, 100),
                 image_instance.file_path.name, 'small')
@@ -38,5 +44,21 @@ class ImageViewSet(viewsets.ModelViewSet):
                 grayscale_img, (500, 500),
                 image_instance.file_path.name, 'medium')
 
-            # Сохраняем объект с обновленными полями
             image_instance.save()
+
+    def perform_update(self, serializer):
+        image_instance = serializer.save()
+        publish_message(
+            'image_updated',
+            image_instance.id,
+            'Image updated successfully'
+        )
+
+    def perform_destroy(self, instance):
+        image_id = instance.id
+        instance.delete()
+        publish_message(
+            'image_deleted',
+            image_id,
+            'Image deleted successfully'
+        )

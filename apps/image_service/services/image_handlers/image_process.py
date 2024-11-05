@@ -10,7 +10,7 @@ def resize_image(img, size):
     """
     Меняет размер изображения до заданных размеров.
     """
-    return img.resize(size, Image.ANTIALIAS)
+    return img.resize(size, Image.LANCZOS)
 
 
 def convert_to_grayscale(img):
@@ -26,7 +26,9 @@ def save_resized_image(img, size, base_path, size_name):
     """
     filename, ext = os.path.splitext(base_path)
     resized_path = f"images/{size_name}/{filename}_{size_name}{ext}"
-    full_path = os.path.join('media', resized_path)
+    full_path = os.path.join('media_converted', resized_path)
+
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
     resized_img = resize_image(img, size)
     resized_img.save(full_path)
