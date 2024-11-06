@@ -2,6 +2,7 @@ from PIL import Image
 import os
 import logging
 from .image_extraction import extract_metadata
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 # ----------------------------------------------------------------
 # https://pillow.readthedocs.io/en/stable/reference/Image.html
@@ -20,7 +21,18 @@ def _resize_image(img, size):
         logger.exception(f"Resize image error: {e}")
         raise RuntimeError("Resize image error.")
 
+# ----------------------------------------------------------------
+# https://tenacity.readthedocs.io/en/latest/
+# ----------------------------------------------------------------
 
+
+@retry(
+    wait=wait_fixed(5),
+    stop=stop_after_attempt(5),
+    reraise=True,
+    retry=(lambda retry_state: isinstance(
+        retry_state.outcome.exception(), RuntimeError)),
+)
 def _convert_to_grayscale(img):
     """
     Преобразует изображение в оттенки серого.
