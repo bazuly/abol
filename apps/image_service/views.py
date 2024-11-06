@@ -28,7 +28,7 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         if not image_instance.file_path:
             raise ValidationError(
-                "Файл не был загружен. Пожалуйста, загрузите файл.")
+                "File not found! Please upload file")
 
         original_image_path = image_instance.file_path.path
         _process_image(image_instance, original_image_path)

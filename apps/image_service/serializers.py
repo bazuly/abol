@@ -9,10 +9,6 @@ class ImageSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'file_path',
-            'file_path_small',
-            'file_path_medium',
             'upload_date',
             'resolution',
-            'size',
-            'format'
         ]
