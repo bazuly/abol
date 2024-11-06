@@ -2,11 +2,16 @@ import pika
 import json
 import logging
 
-# Инициализация логгера
+
+# logger initialization
 logger = logging.getLogger(__name__)
 
+# ----------------------------------------------------------------
+# https://www.rabbitmq.com/tutorials/tutorial-two-python-stream
+# ----------------------------------------------------------------
 
-def publish_message(event_type, image_id, description=""):
+
+def _publish_message(event_type, image_id, description=""):
     """
     Публикация сообщений в RabbitMQ.
     """
@@ -14,7 +19,6 @@ def publish_message(event_type, image_id, description=""):
         pika.ConnectionParameters(host='rabbitmq'))
     channel = connection.channel()
 
-    # Создание очереди, если её ещё нет
     channel.queue_declare(queue='image_events')
 
     message = {
@@ -23,7 +27,6 @@ def publish_message(event_type, image_id, description=""):
         'description': description,
     }
 
-    # Публикация сообщения
     channel.basic_publish(
         exchange='',
         routing_key='image_events',

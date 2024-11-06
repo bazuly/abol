@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+from .image_extraction import extract_metadata
 
 # ----------------------------------------------------------------
 # https://pillow.readthedocs.io/en/stable/reference/Image.html
@@ -34,3 +35,35 @@ def save_resized_image(img, size, base_path, size_name):
     resized_img.save(full_path)
 
     return resized_path
+
+
+def _process_image(image_instance, image_path):
+    original_image_path = image_instance.file_path.path
+    with Image.open(original_image_path) as img:
+        metadata = extract_metadata(img, original_image_path)
+        image_instance.format = metadata['format']
+        image_instance.size = metadata['size']
+        image_instance.resolution = metadata['resolution']
+
+        grayscale_img = convert_to_grayscale(img)
+
+        image_instance.file_path_small = save_resized_image(
+            grayscale_img, (100, 100),
+            image_instance.file_path.name,
+            'small'
+        )
+        image_instance.file_path_medium = save_resized_image(
+            grayscale_img,
+            (500, 500), image_instance.file_path.name,
+            'medium'
+        )
+
+        image_instance.save()
+
+
+def _extract_and_update_metadata(self, image_instance, img, image_path):
+    metadata = extract_metadata(img, image_path)
+    image_instance.format = metadata['format']
+    image_instance.size = metadata['size']
+    image_instance.resolution = metadata['resolution']
+    return metadata
