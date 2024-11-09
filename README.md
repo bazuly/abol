@@ -36,6 +36,8 @@ Image Processing API - это Django REST API для обработки изоб
 
 Собираем контейнер.
 
+    # Собираем локально базовый образ
+    docker build -f image_api/Dockerfile.base -t abol-base .
     docker-compose up --build -d 
     docker-compose exec web python manage.py migrate
     docker-compose exec web python manage.py createsuperuser
