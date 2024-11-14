@@ -2,22 +2,19 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
-
+import sys
 
 load_dotenv()
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-gnh9%e#ax3fzmp9)9r+n83z7$3l5+i$)-1ya!m2eu_h4@^igmd'
-
 
 DEBUG = True
 
 ALLOWED_HOSTS = [
     '*'
 ]
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -27,12 +24,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'apps.image_service',
+    'apps.users',
+
     'rest_framework_simplejwt',
     'rest_framework',
     'drf_yasg',
-
-    'apps.image_service',
-    'apps.users',
 
 ]
 
@@ -66,7 +63,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'image_api.wsgi.application'
 
-
 # database configuration
 DATABASES = {
     'default': {
@@ -78,7 +74,6 @@ DATABASES = {
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -95,7 +90,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -103,7 +97,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 STATIC_URL = 'static/'
 
@@ -131,7 +124,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
-
 
 # swagger settings
 

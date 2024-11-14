@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.base
     restart: always
     container_name: web
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
     working_dir: /app/image_api
     volumes:
       - .:/app
@@ -44,7 +44,7 @@ services:
       context: ./apps/users
       dockerfile: Dockerfile
     container_name: users
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+    command: [ "python", "manage.py", "runserver", "0.0.0.0:8001" ]
     working_dir: /app/apps/users
     volumes:
       - .:/app
@@ -65,7 +65,7 @@ services:
       context: ./apps/image_service
       dockerfile: Dockerfile
     container_name: image_service
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8002"]
+    command: [ "python", "manage.py", "runserver", "0.0.0.0:8002" ]
     working_dir: /app/apps/image_service
     volumes:
       - .:/app
@@ -79,6 +79,25 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  image_service_tests:
+    build:
+      context: ./apps/image_service
+      dockerfile: Dockerfile
+    container_name: image_service_tests
+    command: [ "python", "image_api/manage.py", "test", "apps.image_service.tests" ]
+    working_dir: /app
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=image_api.settings
+      - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
+
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -95,8 +114,7 @@ services:
       context: .
       dockerfile: ./apps/image_service/services/rabbitMQ_handlers/Dockerfile
     container_name: image_event_listener
-    # restart: always
-    command: ["python", "image_event_listener.py"]
+    command: [ "python", "image_event_listener.py" ]
     depends_on:
       rabbitmq:
         condition: service_started
