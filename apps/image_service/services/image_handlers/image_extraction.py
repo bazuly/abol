@@ -1,8 +1,7 @@
 import os
 import logging
 from PIL import Image
-from typing import Any
-
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ def extract_metadata(img: Image.Image, file_path: str) -> dict[str, Any]:
             logger.error(f"File not found {file_path}")
             raise FileNotFoundError(f"File '{file_path}' not found")
 
-        metadata = {
+        metadata: Dict[str, Any] = {
             'format': img.format,
             'resolution': f"{img.width}x{img.height}",
             'size': os.path.getsize(file_path),
