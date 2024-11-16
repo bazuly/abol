@@ -1,11 +1,13 @@
 import os
 import logging
+from PIL import Image
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
 
 
-def extract_metadata(img, file_path):
+def extract_metadata(img: Image.Image, file_path: str) -> dict[str, Any]:
     """
     Извлекает метаданные изображения: формат, разрешение, размер файла.
     """

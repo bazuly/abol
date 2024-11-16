@@ -1,16 +1,17 @@
 import pika
 import json
 import logging
-
+from typing import Any, Optional, Dict
 
 logger = logging.getLogger(__name__)
+
 
 # ----------------------------------------------------------------
 # https://www.rabbitmq.com/tutorials/tutorial-two-python-stream
 # ----------------------------------------------------------------
 
 
-def _publish_message(event_type, image_id, description=""):
+def _publish_message(event_type: str, image_id: Any, description: Optional[str] = "") -> None:
     """
     Публикация сообщений в RabbitMQ.
     """
@@ -20,7 +21,7 @@ def _publish_message(event_type, image_id, description=""):
 
     channel.queue_declare(queue='image_events')
 
-    message = {
+    message: Dict[str, Any] = {
         'event_type': event_type,
         'image_id': image_id,
         'description': description,

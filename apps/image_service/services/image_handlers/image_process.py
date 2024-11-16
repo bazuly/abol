@@ -3,6 +3,7 @@ import os
 import logging
 from .image_extraction import extract_metadata
 from tenacity import retry, stop_after_attempt, wait_fixed
+from typing import Tuple, Dict
 
 # ----------------------------------------------------------------
 # https://pillow.readthedocs.io/en/stable/reference/Image.html
@@ -11,7 +12,7 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 logger = logging.getLogger(__name__)
 
 
-def _resize_image(img, size):
+def _resize_image(img: Image.Image, size: Tuple[int, int]) -> Image.Image:
     """
     Изменение размера изображения до заданных размеров.
     """
@@ -20,6 +21,7 @@ def _resize_image(img, size):
     except Exception as e:
         logger.exception(f"Resize image error: {e}")
         raise RuntimeError("Resize image error.")
+
 
 # ----------------------------------------------------------------
 # https://tenacity.readthedocs.io/en/latest/
@@ -33,7 +35,7 @@ def _resize_image(img, size):
     retry=(lambda retry_state: isinstance(
         retry_state.outcome.exception(), RuntimeError)),
 )
-def _convert_to_grayscale(img):
+def _convert_to_grayscale(img: Image.Image) -> Image.Image:
     """
     Преобразует изображение в оттенки серого.
     """
@@ -46,7 +48,12 @@ def _convert_to_grayscale(img):
             "Grayscale convert error")
 
 
-def _save_resized_image(img, size, base_path, size_name):
+def _save_resized_image(
+        img: Image.Image,
+        size: Tuple[int, int],
+        base_path: str,
+        size_name: str
+) -> str:
     """
     Сохраняет изображение с заданным размером и возвращает путь.
     """
@@ -70,7 +77,14 @@ def _save_resized_image(img, size, base_path, size_name):
         raise RuntimeError("Unexpected save image error:")
 
 
-def _process_image(image_instance, image_path):
+def _process_image(image_instance: object, image_path: str) -> None:
+    """
+    Обрабатывает изображение: изменяет размеры, сохраняет копии и обновляет метаданные.
+
+    Args:
+        image_instance (object): Экземпляр объекта, содержащего данные изображения.
+        Image_path (str): Путь к исходному изображению.
+    """
     try:
         with Image.open(image_path) as img:
             metadata = extract_metadata(img, image_path)
@@ -90,6 +104,7 @@ def _process_image(image_instance, image_path):
             )
 
             image_instance.save()
+
     except FileNotFoundError:
         logger.error(f"File not found: {image_path}")
         raise FileNotFoundError(f"File '{image_path}' not found.")
@@ -98,7 +113,11 @@ def _process_image(image_instance, image_path):
         raise RuntimeError("Unexpected process image error. ")
 
 
-def _extract_and_update_metadata(self, image_instance, img, image_path):
+def _extract_and_update_metadata(
+        image_instance: object,
+        img: Image.Image,
+        image_path: str
+) -> Dict[str, str]:
     try:
         metadata = extract_metadata(img, image_path)
         image_instance.format = metadata['format']
